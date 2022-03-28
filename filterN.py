@@ -2,10 +2,11 @@ import pandas as pd
 import langid
 import xlsxwriter
 from langdetect import detect
-df_old = pd.read_excel("for_translation.xlsx")
+df_old = pd.read_excel("dictionary.xlsx")
 dfc = pd.read_csv("raw.csv")
 dfc.to_excel('raw.xlsx',encoding='utf-8',index = False)
 df = pd.read_excel('raw.xlsx')
+print("Number of entries so far",len(df))
 bengali_words = ['bengali']
 english_words = ['english']
 column_name = ['column_name']
@@ -34,9 +35,9 @@ for column in df.columns:
             column_name.append(column)
             lang.append(lan)
 english_words[0] = "english"
-english_words[1:] = ["=IFERROR(INDEX(OLD!C$2:C$"+str(len(df_old)+1)+",MATCH(1,(NEW!B2=OLD!B$2:B$"+str(len(df_old)+1)+")*1,0),0),COUNT(C$1:C1)+1)" for nam in range(len(bengali_words))]
+english_words[1:] = ["=IFERROR(INDEX(OLD!B$2:B$"+str(len(df_old)+1)+",MATCH(1,(NEW!B2=OLD!A$2:A$"+str(len(df_old)+1)+")*1,0),0),COUNT(C$1:C1)+1)" for nam in range(len(bengali_words))]
 df = pd.DataFrame(zip(column_name,bengali_words,english_words,lang,row))
-df_old.columns = ['column_name','bengali','english','language','respid']
+df_old.columns = ['bengali','english']
 main = pd.ExcelWriter("for_translation.xlsx", engine = 'xlsxwriter')
 df.to_excel(main,sheet_name='NEW',encoding='utf-08',index=False,header = False)
 df_old.to_excel(main,sheet_name='OLD',encoding='utf-08',index=False,header = True)
